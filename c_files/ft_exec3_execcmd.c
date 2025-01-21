@@ -6,16 +6,75 @@
 /*   By: ilevy <ilevy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/18 01:09:32 by ilevy             #+#    #+#             */
-/*   Updated: 2025/01/18 01:09:34 by ilevy            ###   ########.fr       */
+/*   Updated: 2025/01/20 20:08:53 by ilevy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../h_files/ft_minishell.h"
 
+//Searches for the execfile of command basename in the environment as well as any directories directly given
+//Either being from <data.path_dirs> or <basename> containing a relative or direct path to a file.
+//Then store the resulting filename in buffer <filename>
+int	ft_exec3_find_execfile(t_data *data, char *basename, char *filename)
+{
+	if (!basename || !data || !filename)
+		return (1);
+	if (!ft_exec3_find_execfile_in_dir(data, basename, filename)
+		|| !ft_exec3_find_exefile_in_path(data, basename, filename))
+		return (0);
+	ft_printf(LOGSV, "Couldn't find file %s in either PATH or directory.\n", basename);
+	return (1);
+}
+
+int	ft_exec3_find_execfile_in_dir(t_data *data, char *basename, char *filename)
+{
+	char	*dir;
+	int		i;
+
+	if (basename[0] == '~')
+	{
+		i = 0;
+		while (data->env)
+		{
+			if (ft_strncmp("HOME", data->env->name[i], 4) == 0)
+				dir = data->env->name[i];
+			i++;
+		}
+		if (!dir)
+		{
+			ft_printf(LOGSV, "Home directory not found\n");
+			return (1);
+		}
+		filename[0] = '\0';
+		ft_strcat(filename, dir);
+		ft_strcat(filename, '/');
+		ft_strcat(filename, basename + 1);
+		if (access(filename, F_OK) == 0 && access(filename, X_OK) == 0)
+		{
+			ft_printf(LOGSV, "Found file in home directory\n");
+			return (0);
+		}
+		ft_printf(LOGSV, "Could't find or execute file in home directory\n");
+		return (1);
+	}
+	else if (ft_strchr(basename, '/'))
+	{
+		filename[0] = '\0';
+		ft_strcat(filename, basename);
+		if (access(filename, F_OK) == 0 && access(filename, X_OK) == 0)
+		{
+			ft_printf(LOGSV, "Found file with absolute or relative path.\n");
+			return (0);
+		}
+	}
+	ft_printf(LOGSV, "Couldn't find file\n");
+	return (1);
+}
+
 // Searches for the executable file of command <basename>
 // in the directories defined in <data.path_dirs>
 // and stores the resulting filename in buffer <filename>
-int	ft_exec3_find_execfile(t_data *data, char *basename, char *filename)
+int	ft_exec3_find_execfile_in_path(t_data *data, char *basename, char *filename)
 {
 	int		ind;
 
@@ -27,7 +86,10 @@ int	ft_exec3_find_execfile(t_data *data, char *basename, char *filename)
 		ft_strcat(filename, "/");
 		ft_strcat(filename, basename);
 		if (access(filename, F_OK) == 0 && access(filename, X_OK) == 0)
+		{
+			ft_printf(LOGSV, "Found file %s in directory %s with full path being %s", basename, data->path_dirs[ind], filename);
 			return (0);
+		}
 		ind++;
 	}
 	return (1);

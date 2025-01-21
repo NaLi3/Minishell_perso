@@ -6,7 +6,7 @@
 /*   By: ilevy <ilevy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/06 15:19:39 by ilevy             #+#    #+#             */
-/*   Updated: 2025/01/18 01:39:18 by ilevy            ###   ########.fr       */
+/*   Updated: 2025/01/20 20:11:32 by ilevy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,6 +202,9 @@ int		ft_parseX_store_pathname(t_data *data, char *word, char **store, int *index
 
 // EXEC
 void	ft_exec3_execcmd(t_data *data, t_node *current);
+int		ft_exec3_find_execfile(t_data *data, char *basename, char *filename);
+int		ft_exec3_find_execfile_in_dir(t_data *data, char *basename, char *filename);
+int		ft_exec3_find_execfile_in_path(t_data *data, char *basename, char *filename);
 int		ft_exec2_apply_redirections(t_data *data, t_node *current);
 void	ft_exec2_close_redirections(t_data *data, t_node *current);
 int		ft_exec1_exectree_recurr(t_data *data, t_node *current, int depth);
